@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include ("../partials/header.ejs") %>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript">
+      var currentUserObject = {
+        name: "",
+        id: "",
+        playerId: "",
+        roomId: "",
+        numberChoosen: 0,
+      };
+      var x;
+
+      function eventHandle(e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+
+      function startTimerAndSendPayload(sec) {
+        var nextCountDown = 0;
+        sec++;
+        x = setInterval(function () {
+          sec = sec - 1;
+          var el = document.getElementById("countDown");
+          if (el == undefined) {
+            clearInterval(x);
+          } else {
+            el.innerHTML = `${sec} secs to choose your number`;
+          }
+          if (sec < 0) {
+            clearInterval(x);
+            document.getElementById("countDown").innerHTML = "";
+            document.getElementById("countDown").innerText = "Loading...";
+            setTimeout(function () {
+              document.getElementById("countDown").innerText = "";
+
+              // fetch result from the server once count down completes
+              socket.emit(
+                "fetchResult",
+                currentUserObject.roomId,
+                function ({ finalState, playersResult }) {
+                  // draw circle for each player
+                  var circleElement = ``;
+                  playersResult.forEach(function (player) {
+                    let gameState =
+                      player.id == currentUserObject.id ? player.state : "";
+
+                    if (gameState == "skiped") {
+                      document.removeEventListener("click", eventHandle, true);
+                      var bgCol =
+                        document.getElementById("numberZero").style
+                          .backgroundColor;
+                      if (bgCol != "") {
+                        currentUserObject["numberChoosen"] = 0;
+                        socket.emit("clientSendPayload", currentUserObject);
+                      } else {
+                        currentUserObject["numberChoosen"] = 1;
+                        socket.emit("clientSendPayload", currentUserObject);
+                      }
+                    }
+                    if (gameState == "lose") {
+                      clearInterval(x);
+                      socket.emit("losser", currentUserObject);
+                      // window.location = "/losser";
+                      document.getElementById("gameContainer").innerHTML = `
+                                  <b>You have lost the game.</b><br />
+                                  <button class="button button--kari">
+                                    <span onclick=" window.location = '/'">Play Again</span>
+                                  </button>`;
+                    } else {
+                      let fill =
+                        player.id == currentUserObject.id ? "fill" : "";
+                      circleElement += `<div class="ball ${fill}">${player.state}</div>`;
+
+                      if (gameState == "wins" && finalState == "gameEnd") {
+                        clearInterval(x);
+                        setTimeout(function () {
+                          var winnersList = ``;
+                          socket.emit(
+                            "fetchWinners",
+                            currentUserObject.roomId,
+                            function (winners) {
+                              winners.forEach((win) => {
+                                winnersList += `<div class="winner">${win.name}</div>`;
+                              });
+                              document.getElementById(
+                                "gameContainer"
+                              ).innerHTML = `
+                          <h3 class="heading">Winner Announced</h3>
+
+                            <div class="win-wrap">
+                              <div class="winners">
+                                ${winnersList}
+                              </div>
+
+                              <div class="win-wrap">
+                                <button class="button button--kari">
+                                  <span onclick=" window.location = '/'">Play Again</span>
+                                </button>
+                              </div>
+                            </div>`;
+                            }
+                          );
+                          socket.emit("removeRoom", currentUserObject.roomId);
+                        }, 2000);
+                      }
+                    }
+
+                    nextCountDown = player.countDown;
+                  });
+
+                  var gameContainerInner = document.querySelector(
+                    "#gameContainer .game"
+                  );
+                  if (gameContainerInner != null) {
+                    gameContainerInner.innerHTML = circleElement;
+                  }
+
+                  // start next round
+                  if (finalState != "gameEnd") {
+                    startTimerAndSendPayload(nextCountDown);
+                  }
+                }
+              );
+            }, 2000);
+          }
+        }, 1000);
+      }
+
+      // getting username from the browser session
+      let userName = sessionStorage.getItem("playerName");
+      if (userName != null) {
+        // sending the username to the server to register into the game room
+        socket.emit("playerJoin", userName);
+        sessionStorage.removeItem("playerName");
+      }
+
+      socket.on("roomPayload", function (payload) {
+        currentUserObject = {
+          ...currentUserObject,
+          roomId: payload.roomId,
+          id: payload.id,
+          playerId: payload.playerId,
+          name: payload.name,
+        };
+
+        let searchingContainer = document.getElementById("searchingContainer");
+        let gameContainer = document.getElementById("gameContainer");
+        searchingContainer.style.display = "none";
+
+        // draw circle for each player
+        var circleElement = ``;
+        payload.allPlayers.forEach(function (player) {
+          let fill = player.id == currentUserObject.id ? "fill" : "";
+          circleElement += `<div class="ball ${fill}"></div>`;
+        });
+
+        var gameContainerInner = document.querySelector("#gameContainer .game");
+        if (gameContainerInner != null) {
+          gameContainerInner.innerHTML = circleElement;
+        }
+        gameContainer.style.display = "block";
+
+        startTimerAndSendPayload(payload.countDown);
+      });
+
+      socket.on("gameStopped", function (payload) {
+        clearInterval(x);
+        payload.forEach(function (player) {
+          if (player.id == currentUserObject.id) {
+            // if (player.playerStoped == true) {
+            //   document.getElementById("gameContainer").innerHTML = `
+            //                       <b>You have lost the game.</b><br />
+            //                       <button class="button button--kari">
+            //                         <span onclick=" window.location = '/'">Play Again</span>
+            //                       </button>`;
+            // } else {
+              var winnersList = ``;
+              payload.forEach((win) => {
+                // if (win.playerStoped == false) {
+                  winnersList += `<div class="winner">${win.name}</div>`;
+                // }
+              });
+              document.getElementById("gameContainer").innerHTML = `
+                          <h3 class="heading">Winner Announced</h3>
+
+                            <div class="win-wrap">
+                              <div class="winners">
+                                ${winnersList}
+                              </div>
+
+                              <div class="win-wrap">
+                                <button class="button button--kari">
+                                  <span onclick=" window.location = '/'">Play Again</span>
+                                </button>
+                              </div>
+                            </div>`;
+            // }
+          }
+        });
+        socket.emit("removeRoom", currentUserObject.roomId);
+      });
+
+      window.onload = function () {
+        document
+          .getElementById("numberZero")
+          .addEventListener("click", function (event) {
+            resetColor();
+            this.style.backgroundColor = "#bcb4b4";
+
+            currentUserObject["numberChoosen"] = parseInt(
+              event.target.innerText
+            );
+            socket.emit("clientSendPayload", currentUserObject);
+          });
+
+        document
+          .getElementById("numberOne")
+          .addEventListener("click", function (event) {
+            resetColor();
+            this.style.backgroundColor = "#bcb4b4";
+
+            currentUserObject["numberChoosen"] = parseInt(
+              event.target.innerText
+            );
+            socket.emit("clientSendPayload", currentUserObject);
+          });
+      };
+
+      function resetColor() {
+        document.querySelectorAll(".bigball").forEach(function (el) {
+          el.style.backgroundColor = "";
+        });
+      }
+
+      function stopClicked(e) {
+        e.style.backgroundColor = "#bcb4b4";
+        socket.emit("playerQuit", currentUserObject);
+      }
+
+      function continueClicked() {
+        return;
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="content">
+      <h1 class="header">ZERONE</h1>
+      <div class="searching" id="searchingContainer">
+        <p>
+          Waiting for minimum 7 players to join the room and start the game...
+        </p>
+      </div>
+      <div class="gameContainer" id="gameContainer" style="display: none">
+        <div class="btn-wrap">
+          <button
+            class="button button--pan"
+            id="stopBtn"
+            onclick="stopClicked(this)"
+          >
+            <span>Stop</span>
+          </button>
+          <button
+            class="button button--pan"
+            id="continueBtn"
+            onclick="continueClicked()"
+          >
+            <span>Continue</span>
+          </button>
+        </div>
+
+        <div class="game">
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball fill"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+          <div class="ball"></div>
+        </div>
+
+        <div class="nums-wrap">
+          <p id="countDown"></p>
+          <div
+            class="bigball"
+            id="numberZero"
+            style="background-color: #bcb4b4"
+          >
+            0
+          </div>
+          <div class="bigball adjust-right" id="numberOne">1</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

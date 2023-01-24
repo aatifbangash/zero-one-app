@@ -1,0 +1,183 @@
+body{
+	width: 100%;
+}
+
+.content {
+	max-width: 500px;
+	margin: auto;
+	background: white;
+	padding: 10px;
+}
+
+.header{
+	text-align:center;
+	font-family: 'Trebuchet MS', sans-serif;
+	font-weight: bold;
+}
+
+form{
+	margin: 0 auto;
+	text-align: center;
+	margin-top: 40px;
+}
+
+form input{
+	border: 1px solid grey;
+	line-height: 40px;
+	background: lightgray;
+	width:50%;
+	text-align: center;
+}
+
+button{
+	font-family: 'Courier New', monospace;
+	margin-top: 30px;
+	border: 0px;
+	font-size: 30px;
+}
+
+h2{
+	text-align: center;
+}
+
+h3{
+	text-align: center;
+}
+
+.heading{
+	margin-top: 50px;
+}
+
+.searching{
+    border: 1px solid grey;
+    width: 260px;
+    height: 130px;
+    margin: auto;
+	margin-top: 62px;
+    padding: 12px;
+	padding-top:12px;
+	border-radius: 10px;
+}
+
+.searching p {
+	font-size: 16px;
+	font-weight: normal;
+	color: grey;
+	text-align: center;
+	font-family: 'Courier New', monospace;
+}
+
+.game{
+	width: 200px;
+    min-height: 100px;
+    margin: auto;
+	margin-top: 62px;
+	overflow: hidden;
+}
+
+.ball{
+	border-radius: 50px;
+	width: 50px;
+	height: 50px;
+	border: 1px solid #000;
+	float: left;
+	text-align: center;
+    vertical-align: middle;
+    padding-top: 18px;
+    font-size: 9px;
+    font-weight: bold;
+}
+
+.nums-wrap{
+	width: 300px;
+	margin: auto;
+	overflow: hidden;
+	margin-top: 80px;
+	padding-left: 30px;
+}
+
+.bigball{
+	border-radius: 50px;
+	width: 60px;
+	height: 60px;
+	border: 1px solid #000;
+	float: left;
+	text-align: center;
+	font-weight: bold;
+	font-size: 32px;
+	padding-top:8px;
+	margin-right: 30px;
+}
+
+.fill{
+	background: #000;
+	color: #fff;
+}
+
+.btn-wrap{
+	width: 180px;
+	margin: auto;
+	margin-top: 20px;
+}
+
+.win-wrap{
+	width: 180px;
+	margin: auto;
+	margin-top: 20px;
+	text-align:center;
+}		
+
+.button {
+    pointer-events: auto;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 5px;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    position: relative;
+    display: inline-block;
+	min-width: 80px;
+	
+}
+
+.button--pan {
+    font-family: aktiv-grotesk-extended, sans-serif;
+    font-weight: 700;
+    border-radius: 3rem;
+    overflow: hidden;
+	border: 1px solid gray;
+}
+
+.adjust-right {
+	float: right;
+}
+
+.winner{
+	font-weight: bold;
+	font-family: Garamond, serif;
+	font-size: 24px;
+}
+
+.button--kari {
+    font-family: freight-display-pro, serif;
+    font-weight: 900;
+    font-size: 2rem;
+    border-radius: 50%;
+    border: 2px solid #000;
+	padding: 10px;
+	margin-top: 40px;
+}
+
+#gameContainer {
+	text-align: center;
+}
+
+#countDown{
+	font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 40px;
+	font-family: monospace;
+	text-align: left;
+}

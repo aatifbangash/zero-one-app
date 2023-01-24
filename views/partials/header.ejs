@@ -1,0 +1,56 @@
+<title>Zero One App</title>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script
+  type="text/javascript"
+  src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"
+></script>
+<link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css" />
+<link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
+<script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+<script>
+
+  // establish a socket connection with a server.
+  var socket = io();
+
+  // this event will execute when browser windows load completely.
+  window.onload = function () {
+
+    // reference to the Username form
+    var joinForm = document.getElementById("joinForm");
+
+    // reference to the Username input field
+    var userNameInput = document.getElementById("username");
+
+    // reference to the Username form submit button
+    var inputSubmit = document.getElementById("submitBtn");
+    
+    // following block will execute when user enter the username and hit the submit buttion.
+    if (joinForm != undefined) {
+
+      // attach the submit event to the form
+      joinForm.addEventListener("submit", function (e) {
+
+        // prevent the browser to reload after the submit
+        e.preventDefault();
+
+        // if username input is given
+        if (userNameInput.value) {
+
+          // storing the username into the browser session.
+          sessionStorage.setItem("playerName", userNameInput.value);
+          userNameInput.value = "";
+
+          // redirect to the /game route
+          window.location = "/game";
+        } else {
+          alert("Please enter username.")
+        }
+      });
+    }
+  };
+</script>

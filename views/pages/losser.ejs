@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include ("../partials/header.ejs") %>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <script>
+    // getting username from the browser session
+    let userName = sessionStorage.getItem("playerName");
+    if (userName != null) {
+    //   sessionStorage.removeItem("playerName");
+    }
+  </script>
+  <body>
+    <div class="content">
+      <h1 class="header">ZERONE</h1>
+
+      <h3 class="heading">You have lost the game.</h3>
+
+      <div class="win-wrap">
+        <div class="win-wrap">
+          <button class="button button--kari">
+            <span onclick=" window.location = '/'">Play Again</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

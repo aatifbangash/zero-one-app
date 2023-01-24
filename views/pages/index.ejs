@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include ("../partials/header.ejs") %>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <div class="content">
+      <h1 class="header">ZERONE</h1>
+      <form id="joinForm">
+        <input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="CHOOSE USERNAME"
+		  autocomplete="off"
+        /><br />
+        <button id="submitBtn" type="submit">Enter Match</button>
+      </form>
+      <h2 class="heading">Sound</h2>
+      <h2>
+        <i
+          class="fa fa-volume-up"
+          style="
+            border: 1px solid grey;
+            padding: 5px;
+            border-radius: 5px;
+            width: 40px;
+            margin: 0px;
+          "
+          aria-hidden="true"
+        ></i>
+        <i
+          class="fa fa-volume-off"
+          style="
+            border: 1px solid grey;
+            padding: 5px;
+            border-radius: 5px;
+            width: 40px;
+            margin: 0px;
+          "
+          aria-hidden="true"
+        ></i>
+      </h2>
+    </div>
+  </body>
+</html>
